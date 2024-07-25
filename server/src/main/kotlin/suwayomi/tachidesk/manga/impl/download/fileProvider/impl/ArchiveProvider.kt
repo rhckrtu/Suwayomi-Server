@@ -84,24 +84,48 @@ class ArchiveProvider(mangaId: Int, chapterId: Int) : ChaptersFilesProvider(mang
     }
 
     private fun extractCbzFile(
-        cbzFile: File,
-        chapterFolder: File,
-    ) {
-        if (!chapterFolder.exists()) chapterFolder.mkdirs()
-        ZipArchiveInputStream(cbzFile.inputStream()).use { zipInputStream ->
-            var zipEntry = zipInputStream.nextEntry
-            while (zipEntry != null) {
-                val file = File(chapterFolder, zipEntry.name)
-                if (!file.exists()) {
-                    file.parentFile.mkdirs()
-                    file.createNewFile()
-                }
-                file.outputStream().use { outputStream ->
-                    zipInputStream.copyTo(outputStream)
-                }
-                zipEntry = zipInputStream.nextEntry
-            }
-        }
-        cbzFile.delete()
+    cbzFile: File,
+    chapterFolder: File,
+) {
+    println("Starting extraction process...")
+    
+    if (!chapterFolder.exists()) {
+        println("Creating chapter folder: ${chapterFolder.absolutePath}")
+        chapterFolder.mkdirs()
+    } else {
+        println("Chapter folder already exists: ${chapterFolder.absolutePath}")
     }
+
+    ZipArchiveInputStream(cbzFile.inputStream()).use { zipInputStream ->
+        var zipEntry = zipInputStream.nextEntry
+        while (zipEntry != null) {
+            val file = File(chapterFolder, zipEntry.name)
+            println("Processing entry: ${zipEntry.name}")
+
+            if (!file.exists()) {
+                println("Creating file: ${file.absolutePath}")
+                file.parentFile.mkdirs()
+                file.createNewFile()
+            } else {
+                println("File already exists: ${file.absolutePath}")
+            }
+
+            file.outputStream().use { outputStream ->
+                println("Copying contents to file: ${file.absolutePath}")
+                zipInputStream.copyTo(outputStream)
+            }
+
+            println("Entry processed: ${zipEntry.name}")
+            zipEntry = zipInputStream.nextEntry
+        }
+    }
+
+    if (cbzFile.delete()) {
+        println("Deleted CBZ file: ${cbzFile.absolutePath}")
+    } else {
+        println("Failed to delete CBZ file: ${cbzFile.absolutePath}")
+    }
+    
+    println("Extraction process completed.")
+}
 }
