@@ -9,6 +9,7 @@ import org.apache.commons.compress.archivers.zip.ZipFile
 import org.kodein.di.DI
 import org.kodein.di.conf.global
 import org.kodein.di.instance
+import mu.KotlinLogging
 import suwayomi.tachidesk.manga.impl.download.fileProvider.ChaptersFilesProvider
 import suwayomi.tachidesk.manga.impl.util.getChapterCachePath
 import suwayomi.tachidesk.manga.impl.util.getChapterCbzPath
@@ -18,6 +19,7 @@ import suwayomi.tachidesk.server.ApplicationDirs
 import java.io.File
 import java.io.InputStream
 
+private val logger = KotlinLogging.logger {}
 private val applicationDirs by DI.global.instance<ApplicationDirs>()
 
 class ArchiveProvider(mangaId: Int, chapterId: Int) : ChaptersFilesProvider(mangaId, chapterId) {
